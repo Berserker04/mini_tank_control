@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="http://127.0.0.1:5500/test.html"></domain>
+    </domain-config>
+</network-security-config>
