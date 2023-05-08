@@ -4,6 +4,10 @@ import 'package:mini_tank_control/widgets/html_view.dart';
 import 'package:mini_tank_control/widgets/sensors.dart';
 import 'package:mini_tank_control/widgets/state_bar.dart';
 
+const bluetoothDevice = BluetoothDevice(name: 'Seleccionar', address: "xxx");
+
+List<BluetoothDevice> list = <BluetoothDevice>[bluetoothDevice];
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft])
@@ -90,6 +94,108 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
+  // NUEEEEEEEEEEEEEEEE CODE
+  final _bluetooth = FlutterBluetoothSerial.instance;
+  late BluetoothConnection connection;
+
+  List<BluetoothDevice> _devicesList = [];
+  bool _connected = false;
+  bool _connecting = false;
+  bool isDisconnecting = false;
+  bool _stateLed = false;
+  bool _stateBlink = false;
+
+  double power = 255;
+  double blinkIntensity = 500;
+
+  final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 20, backgroundColor: Colors.white));
+
+  void connectRequest(context) async {
+    setState(() {
+      _connecting = true;
+    });
+    await FlutterBluetoothSerial.instance.requestEnable();
+
+    try {
+      if (await Permission.bluetoothConnect.request().isGranted &&
+          await Permission.bluetoothScan.request().isGranted) {}
+
+      _devicesList = await _bluetooth.getBondedDevices();
+      BluetoothDevice hc_05 = _devicesList.firstWhere(
+          (device) => device.name == "HC-05",
+          orElse: () => const BluetoothDevice(address: "0", name: "not found"));
+
+      if (hc_05.address == "0") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('¡conectar primero al dispositivo HC-05!'),
+            action: SnackBarAction(
+              label: 'Ok',
+              onPressed: () {},
+            ),
+          ),
+        );
+      }
+
+      connection = await BluetoothConnection.toAddress(hc_05.address);
+      _connected = true;
+      // print('Connected to the device');
+      _connecting = false;
+      setState(() {});
+    } catch (e) {
+      // print("Error: ");
+      // print(e);
+      _connecting = false;
+      setState(() {});
+    }
+  }
+
+  void disconnectRequest() async {
+    try {
+      // print('Disconecte');
+      connection.close();
+      // print('Disconecte to the device');
+      _connected = false;
+      setState(() {});
+    } on PlatformException {
+      // print("Error");
+    }
+  }
+
+  void onLed() {
+    _stateLed = true;
+    sendCommand("Led6/$power");
+  }
+
+  void offLed() {
+    _stateLed = false;
+    _stateBlink = false;
+    sendCommand("Led6/0");
+    sendCommand("Led6Blink/0");
+  }
+
+  void blinkingLight() {
+    _stateLed = true;
+    _stateBlink = true;
+    sendCommand("Led6Blink/$blinkIntensity");
+    sendCommand("Led6/$power");
+  }
+
+  void blinkingLightOff() {
+    _stateBlink = false;
+    sendCommand("Led6Blink/0");
+  }
+
+  void sendCommand(String command) async {
+    if (_connected) {
+      connection.output.add(Uint8List.fromList("$command\n".codeUnits));
+      await connection.output.allSent;
+      setState(() {});
+    }
+  }
+  // eddddddddddddddddn
 
   @override
   Widget build(BuildContext context) {
