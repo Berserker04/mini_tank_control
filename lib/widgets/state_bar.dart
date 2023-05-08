@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class StatusBar extends StatefulWidget {
-  const StatusBar({super.key});
+  final Color colorBtl;
+  final Color colorNetwork;
+
+  StatusBar({required this.colorBtl, required this.colorNetwork, super.key});
 
   @override
   State<StatusBar> createState() => _StatusBarState();
@@ -35,7 +38,7 @@ class _StatusBarState extends State<StatusBar> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.end,
-            children: const [
+            children: [
               RotatedBox(
                 quarterTurns: 1,
                 child: Icon(
@@ -44,8 +47,8 @@ class _StatusBarState extends State<StatusBar> {
                   color: Color(0xff72D838),
                 ),
               ),
-              Icon(Icons.bluetooth, size: 35, color: Color(0xff72D838)),
-              Icon(Icons.wifi, size: 35, color: Color(0xff72D838)),
+              Icon(Icons.bluetooth, size: 35, color: widget.colorBtl),
+              Icon(Icons.wifi, size: 35, color: widget.colorNetwork),
             ],
           ),
         ),

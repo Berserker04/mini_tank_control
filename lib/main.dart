@@ -5,6 +5,7 @@ import 'package:mini_tank_control/widgets/html_view.dart';
 import 'package:mini_tank_control/widgets/sensors.dart';
 import 'package:mini_tank_control/widgets/state_bar.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 const bluetoothDevice = BluetoothDevice(name: 'Seleccionar', address: "xxx");
 
@@ -45,18 +46,40 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double _movingY = 2;
   double _movingX = 2;
+  bool _connectedToNetwork = false;
 
   void _movingYHandle(double value) {
     setState(() {
       _movingY = value;
     });
+
+    if (value == 1) {
+      _forward();
+    } else if (value == 3) {
+      _backward();
+    } else {
+      _stopTank();
+    }
   }
 
   void _movingXHandle(double value) {
     setState(() {
       _movingX = value;
     });
+
+    if (value == 1) {
+      _toTheLeft();
+    } else if (value == 3) {
+      _toTheRight();
+    } else {
+      _stopTank();
+    }
   }
+
+  // _forward
+// _backward
+// _toTheLeft
+// _toTheRight
 
   SliderThemeData _getThemeSlider() {
     return SliderTheme.of(context).copyWith(
@@ -166,28 +189,35 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void onLed() {
+// _forward
+// _backward
+// _toTheLeft
+// _toTheRight
+// _stopTank
+
+  void _forward() {
     _stateLed = true;
-    sendCommand("LedVerde/0");
+    sendCommand("LedVerde/1");
   }
 
-  void offLed() {
-    _stateLed = false;
-    _stateBlink = false;
-    sendCommand("Led6/0");
-    sendCommand("Led6Blink/0");
-  }
-
-  void blinkingLight() {
+  void _backward() {
     _stateLed = true;
-    _stateBlink = true;
-    sendCommand("Led6Blink/$blinkIntensity");
-    sendCommand("Led6/$power");
+    sendCommand("LedAzul/1");
   }
 
-  void blinkingLightOff() {
-    _stateBlink = false;
-    sendCommand("Led6Blink/0");
+  void _toTheLeft() {
+    _stateLed = true;
+    sendCommand("LedAmarillo/1");
+  }
+
+  void _toTheRight() {
+    _stateLed = true;
+    sendCommand("LedRojo/1");
+  }
+
+  void _stopTank() {
+    _stateLed = true;
+    sendCommand("stop/1");
   }
 
   void sendCommand(String command) async {
@@ -199,8 +229,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   // eddddddddddddddddn
 
+  void checkNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        setState(() {
+          _connectedToNetwork = true;
+        });
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+      setState(() {
+        _connectedToNetwork = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    checkNetwork();
     return Scaffold(
       appBar: AppBar(
         // actionsIconTheme: IconThemeData(color: Colors.black, size: SizedBox(height: 100,)),
@@ -209,21 +257,23 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 100,
             width: 70,
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.power_settings_new,
                 size: 35,
-                color: Colors.red,
+                color: !_connected ? Colors.green : Colors.red,
                 weight: 5,
               ),
               onPressed: () {
-                connectRequest(context);
-                onLed();
-                print("Conectando a BTL");
+                if (_connected) {
+                  disconnectRequest();
+                } else {
+                  connectRequest(context);
+                }
               },
             ),
           )
         ],
-        title: Text(widget.title),
+        title: Text(_connecting ? 'Conectando...' : widget.title),
         centerTitle: true,
       ),
       body: Center(
@@ -256,15 +306,27 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                 )),
-            const Expanded(flex: 5, child: HtmlView()),
+            Expanded(
+                flex: 5,
+                child: _connectedToNetwork
+                    ? const HtmlView()
+                    : Center(
+                        child: const Text("Sin conexión a internet",
+                            style: TextStyle(color: Colors.red)),
+                      )),
             Expanded(
                 flex: 3,
                 child: Container(
                   child: Column(
                     children: [
-                      const Expanded(
+                      Expanded(
                         flex: 1,
-                        child: StatusBar(),
+                        child: StatusBar(
+                          colorBtl: _connected ? Color(0xff72D838) : Colors.red,
+                          colorNetwork: _connectedToNetwork
+                              ? Color(0xff72D838)
+                              : Colors.red,
+                        ),
                       ),
                       Expanded(
                           flex: 1,

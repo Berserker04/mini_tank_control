@@ -14,10 +14,8 @@ class _CustomSliderState extends State<CustomSlider> {
   }
 }
 
-
 class PolygonSliderThumb extends SliderComponentShape {
-
-final double thumbRadius;
+  final double thumbRadius;
   final double sliderValue;
 
   const PolygonSliderThumb({
@@ -27,7 +25,7 @@ final double thumbRadius;
 
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) {
-     return Size.fromRadius(thumbRadius);
+    return Size.fromRadius(thumbRadius);
   }
 
   @override
