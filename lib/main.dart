@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:mini_tank_control/widgets/html_view.dart';
 import 'package:mini_tank_control/widgets/sensors.dart';
 import 'package:mini_tank_control/widgets/state_bar.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 const bluetoothDevice = BluetoothDevice(name: 'Seleccionar', address: "xxx");
 
@@ -166,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onLed() {
     _stateLed = true;
-    sendCommand("Led6/$power");
+    sendCommand("LedVerde/0");
   }
 
   void offLed() {
@@ -214,6 +216,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 weight: 5,
               ),
               onPressed: () {
+                connectRequest(context);
+                onLed();
                 print("Conectando a BTL");
               },
             ),
