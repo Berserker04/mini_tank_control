@@ -67,18 +67,49 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future _getModal() {
+    return showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 300,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text('Conectar con el tanque'),
+                ElevatedButton(
+                  child: const Text('Conectar'),
+                  onPressed: () => print("conectando al tanque ..."),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         // actionsIconTheme: IconThemeData(color: Colors.black, size: SizedBox(height: 100,)),
-        actions: const [
+        actions: [
           SizedBox(
             height: 100,
             width: 70,
-            child: Icon(
-              Icons.settings,
-              size: 35,
+            child: IconButton(
+              icon: const Icon(
+                Icons.power_settings_new,
+                size: 35,
+                color: Colors.red,
+                weight: 5,
+              ),
+              onPressed: () {
+                print("Conectando a BTL");
+              },
             ),
           )
         ],
