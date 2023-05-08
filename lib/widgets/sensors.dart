@@ -15,7 +15,8 @@ class _SensorsState extends State<Sensors> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.only(left: 15.0, top: 10.0),
       decoration: BoxDecoration(
-          color: Color(0xff014B63), borderRadius: BorderRadius.circular(10)),
+          color: Color.fromARGB(255, 13, 59, 98),
+          borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [

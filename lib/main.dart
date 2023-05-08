@@ -52,6 +52,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  SliderThemeData _getThemeSlider() {
+    return SliderTheme.of(context).copyWith(
+      trackHeight: 50.0,
+      trackShape: const RoundedRectSliderTrackShape(),
+      activeTrackColor: const Color(0xffBCBCBC),
+      inactiveTrackColor: const Color(0xffBCBCBC),
+      thumbShape: const RoundSliderThumbShape(
+        enabledThumbRadius: 30.0,
+        pressedElevation: 8.0,
+      ),
+      thumbColor: const Color(0xff2196F3),
+      tickMarkShape: const RoundSliderTickMarkShape(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,12 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           flex: 1,
                           child: RotatedBox(
                             quarterTurns: 1,
-                            child: Slider(
-                                max: 3,
-                                min: 1,
-                                value: _movingY,
-                                divisions: 2,
-                                onChanged: _movingYHandle),
+                            child: SliderTheme(
+                              data: _getThemeSlider(),
+                              child: Slider(
+                                  max: 3,
+                                  min: 1,
+                                  value: _movingY,
+                                  divisions: 2,
+                                  onChanged: _movingYHandle),
+                            ),
                           ))
                     ],
                   ),
@@ -109,12 +127,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Expanded(
                           flex: 1,
-                          child: Slider(
-                              max: 3,
-                              min: 1,
-                              value: _movingX,
-                              divisions: 2,
-                              onChanged: _movingXHandle))
+                          child: SliderTheme(
+                            data: _getThemeSlider(),
+                            child: Slider(
+                                max: 3,
+                                min: 1,
+                                value: _movingX,
+                                divisions: 2,
+                                onChanged: _movingXHandle),
+                          ))
                     ],
                   ),
                 )),
