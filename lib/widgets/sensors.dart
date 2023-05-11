@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
 class Sensors extends StatefulWidget {
-  const Sensors({super.key});
+  final String sensor1;
+  final String sensor2;
+  final String sensor3;
+
+  const Sensors(
+      {required this.sensor1,
+      required this.sensor2,
+      required this.sensor3,
+      super.key});
 
   @override
   State<Sensors> createState() => _SensorsState();
@@ -19,13 +27,13 @@ class _SensorsState extends State<Sensors> {
           borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('sensor ${'1'}',
-              style: TextStyle(color: Colors.white, fontSize: 18)),
-          Text('sensor ${'2'}',
-              style: TextStyle(color: Colors.white, fontSize: 18)),
-          Text('sensor ${'3'}',
-              style: TextStyle(color: Colors.white, fontSize: 18)),
+        children: [
+          Text('sensor: ${widget.sensor1}',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
+          Text('sensor: ${widget.sensor2}',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
+          Text('sensor: ${widget.sensor3}',
+              style: TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

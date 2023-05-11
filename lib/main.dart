@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
@@ -10,6 +12,8 @@ import 'dart:io';
 const bluetoothDevice = BluetoothDevice(name: 'Seleccionar', address: "xxx");
 
 List<BluetoothDevice> list = <BluetoothDevice>[bluetoothDevice];
+
+const ascii = AsciiDecoder();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +50,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double _movingY = 2;
   double _movingX = 2;
+  double _movingSpeed = 250 / 2;
   bool _connectedToNetwork = false;
+  String _sensor1 = "---";
+  String _sensor2 = "---";
+  String _sensor3 = "---";
+
+  // _MyHomePageState() {
+  //   checkNetwork();
+  // }
 
   void _movingYHandle(double value) {
     setState(() {
@@ -58,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (value == 3) {
       _backward();
     } else {
-      _stopTank();
+      _stopTankY();
     }
   }
 
@@ -72,8 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (value == 3) {
       _toTheRight();
     } else {
-      _stopTank();
+      _stopTankX();
     }
+  }
+
+  void _movingSpeedHandle(double value) {
+    setState(() {
+      _movingSpeed = value;
+    });
+    sendCommand("movingSpeed/$value");
   }
 
   // _forward
@@ -83,17 +102,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   SliderThemeData _getThemeSlider() {
     return SliderTheme.of(context).copyWith(
-      trackHeight: 50.0,
-      trackShape: const RoundedRectSliderTrackShape(),
-      activeTrackColor: const Color(0xffBCBCBC),
-      inactiveTrackColor: const Color(0xffBCBCBC),
-      thumbShape: const RoundSliderThumbShape(
-        enabledThumbRadius: 30.0,
-        pressedElevation: 8.0,
-      ),
-      thumbColor: const Color(0xff2196F3),
-      tickMarkShape: const RoundSliderTickMarkShape(),
-    );
+        trackHeight: 40.0,
+        trackShape: const RoundedRectSliderTrackShape(),
+        activeTrackColor: const Color(0xffBCBCBC),
+        inactiveTrackColor: const Color(0xffBCBCBC),
+        thumbShape: const RoundSliderThumbShape(
+          enabledThumbRadius: 25.0,
+          pressedElevation: 8.0,
+        ),
+        thumbColor: const Color(0xff2196F3),
+        tickMarkShape: const RoundSliderTickMarkShape(),
+        disabledThumbColor: Colors.red,
+        activeTickMarkColor: Color(0xffBCBCBC),
+        inactiveTickMarkColor: Color(0xffBCBCBC));
   }
 
   Future _getModal() {
@@ -165,13 +186,49 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       connection = await BluetoothConnection.toAddress(hc_05.address);
+
+      connection.input?.listen((Uint8List data) {
+        // print('Data incoming: ${ascii.convert(data)}');
+
+        String newData = ascii.convert(data);
+
+        print('Data incoming: $newData');
+
+        List<String> toArray = newData.split("/");
+
+        if (toArray.length == 2) {
+          String key = toArray[0];
+          String value = toArray[1];
+
+          if (key == "sensor1") {
+            setState(() {
+              _sensor1 = value;
+            });
+          } else if (key == "sensor2") {
+            setState(() {
+              _sensor2 = value;
+            });
+          } else if (key == "sensor3") {
+            setState(() {
+              _sensor3 = value;
+            });
+          }
+        }
+
+        // connection.output.add(data); // Sending data
+
+        // if (ascii.decode(data).contains('!')) {
+        //     connection.finish(); // Closing connection
+        //     print('Disconnecting by local host');
+        // }
+      }).onDone(() {
+        print('Disconnected by remote request');
+      });
+
       _connected = true;
-      // print('Connected to the device');
       _connecting = false;
       setState(() {});
     } catch (e) {
-      // print("Error: ");
-      // print(e);
       _connecting = false;
       setState(() {});
     }
@@ -189,35 +246,34 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-// _forward
-// _backward
-// _toTheLeft
-// _toTheRight
-// _stopTank
-
   void _forward() {
     _stateLed = true;
-    sendCommand("LedVerde/1");
+    sendCommand("forward/1");
   }
 
   void _backward() {
     _stateLed = true;
-    sendCommand("LedAzul/1");
+    sendCommand("backward/1");
   }
 
   void _toTheLeft() {
     _stateLed = true;
-    sendCommand("LedAmarillo/1");
+    sendCommand("toTheLeft/1");
   }
 
   void _toTheRight() {
     _stateLed = true;
-    sendCommand("LedRojo/1");
+    sendCommand("toTheRight/1");
   }
 
-  void _stopTank() {
+  void _stopTankY() {
     _stateLed = true;
-    sendCommand("stop/1");
+    sendCommand("stopTankY/1");
+  }
+
+  void _stopTankX() {
+    _stateLed = true;
+    sendCommand("stopTankX/1");
   }
 
   void sendCommand(String command) async {
@@ -227,19 +283,18 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
   }
-  // eddddddddddddddddn
 
   void checkNetwork() async {
     try {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
+        // print('connected');
         setState(() {
           _connectedToNetwork = true;
         });
       }
     } on SocketException catch (_) {
-      print('not connected');
+      // print('not connected');
       setState(() {
         _connectedToNetwork = false;
       });
@@ -285,23 +340,68 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   child: Column(
                     children: [
-                      const Expanded(
-                        flex: 1,
-                        child: Sensors(),
+                      Expanded(
+                        flex: 3,
+                        child: Sensors(
+                          sensor1: _sensor1,
+                          sensor2: _sensor2,
+                          sensor3: _sensor3,
+                        ),
                       ),
                       Expanded(
-                          flex: 1,
-                          child: RotatedBox(
-                            quarterTurns: 1,
-                            child: SliderTheme(
-                              data: _getThemeSlider(),
-                              child: Slider(
-                                  max: 3,
-                                  min: 1,
-                                  value: _movingY,
-                                  divisions: 2,
-                                  onChanged: _movingYHandle),
-                            ),
+                          flex: 4,
+                          child: Row(
+                            children: [
+                              Expanded(flex: 3, child: Container()),
+                              Expanded(
+                                  flex: 8,
+                                  child: RotatedBox(
+                                    quarterTurns: 1,
+                                    child: SliderTheme(
+                                      data: _getThemeSlider(),
+                                      child: Slider(
+                                          max: 3,
+                                          min: 1,
+                                          value: _movingY,
+                                          divisions: 2,
+                                          onChanged: _movingYHandle),
+                                    ),
+                                  )),
+                              Expanded(
+                                  flex: 3,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                            flex: 1,
+                                            child: Text(
+                                                '${_movingSpeed.toInt()}/kh')),
+                                        Expanded(
+                                            flex: 5,
+                                            child: Container(
+                                              margin: const EdgeInsets.all(0),
+                                              padding: const EdgeInsets.all(0),
+                                              // color: Colors.red,
+                                              child: RotatedBox(
+                                                quarterTurns: 3,
+                                                child: Container(
+                                                  // color: Colors.green,
+                                                  child: Slider(
+                                                      max: 255,
+                                                      min: 1,
+                                                      value: _movingSpeed,
+                                                      // divisions: 2,
+                                                      onChanged:
+                                                          _movingSpeedHandle),
+                                                ),
+                                              ),
+                                            )),
+                                        Expanded(flex: 1, child: Text("speed")),
+                                      ],
+                                    ),
+                                  ))
+                            ],
                           ))
                     ],
                   ),
