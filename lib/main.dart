@@ -152,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _stateLed = false;
   final bool _stateBlink = false;
 
-  double power = 255;
+  double power = 250;
   double blinkIntensity = 500;
 
   final ButtonStyle style = ElevatedButton.styleFrom(
@@ -312,11 +312,17 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 100,
             width: 70,
             child: IconButton(
-              icon: Icon(
-                Icons.power_settings_new,
-                size: 35,
-                color: !_connected ? Colors.green : Colors.red,
-                weight: 5,
+              icon: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: _connected ? Colors.green : Colors.red,
+                ),
+                child: Icon(
+                  Icons.power_settings_new,
+                  size: 35,
+                  color: Colors.white,
+                  weight: 5,
+                ),
               ),
               onPressed: () {
                 if (_connected) {
@@ -374,9 +380,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Column(
                                       children: [
                                         Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                                '${_movingSpeed.toInt()}/kh')),
+                                          flex: 2,
+                                          child: Center(
+                                              child: Text(
+                                            '${_movingSpeed.toInt()}\nkh',
+                                            textAlign: TextAlign.center,
+                                          )),
+                                        ),
                                         Expanded(
                                             flex: 5,
                                             child: Container(
@@ -388,7 +398,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 child: Container(
                                                   // color: Colors.green,
                                                   child: Slider(
-                                                      max: 255,
+                                                      max: 250,
                                                       min: 1,
                                                       value: _movingSpeed,
                                                       // divisions: 2,
