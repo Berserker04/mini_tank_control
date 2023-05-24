@@ -4,7 +4,7 @@ class StatusBar extends StatefulWidget {
   final Color colorBtl;
   final Color colorNetwork;
 
-  StatusBar({required this.colorBtl, required this.colorNetwork, super.key});
+  const StatusBar({required this.colorBtl, required this.colorNetwork, super.key});
 
   @override
   State<StatusBar> createState() => _StatusBarState();
@@ -13,7 +13,7 @@ class StatusBar extends StatefulWidget {
 class _StatusBarState extends State<StatusBar> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       // color: Colors.red,
       child: Align(
@@ -39,7 +39,7 @@ class _StatusBarState extends State<StatusBar> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              RotatedBox(
+              const RotatedBox(
                 quarterTurns: 1,
                 child: Icon(
                   Icons.battery_full,

@@ -29,12 +29,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Tank Control'),
+      // theme: ThemeData(
+      //   primarySwatch: Colors.blue,
+      // ),
+      home: MyHomePage(title: 'Tank Control'),
     );
   }
 }
@@ -65,9 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
       _movingY = value;
     });
 
-    if (value == 1) {
+    if (value == 3) {
       _forward();
-    } else if (value == 3) {
+    } else if (value == 1) {
       _backward();
     } else {
       _stopTankY();
@@ -113,8 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
         thumbColor: const Color(0xff2196F3),
         tickMarkShape: const RoundSliderTickMarkShape(),
         disabledThumbColor: Colors.red,
-        activeTickMarkColor: Color(0xffBCBCBC),
-        inactiveTickMarkColor: Color(0xffBCBCBC));
+        activeTickMarkColor: const Color(0xffBCBCBC),
+        inactiveTickMarkColor: const Color(0xffBCBCBC));
   }
 
   Future _getModal() {
@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _connecting = false;
   bool isDisconnecting = false;
   bool _stateLed = false;
-  bool _stateBlink = false;
+  final bool _stateBlink = false;
 
   double power = 255;
   double blinkIntensity = 500;
@@ -397,7 +397,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 ),
                                               ),
                                             )),
-                                        Expanded(flex: 1, child: Text("speed")),
+                                        const Expanded(
+                                            flex: 1, child: Text("speed")),
                                       ],
                                     ),
                                   ))
@@ -410,8 +411,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 flex: 5,
                 child: _connectedToNetwork
                     ? const HtmlView()
-                    : Center(
-                        child: const Text("Sin conexión a internet",
+                    : const Center(
+                        child: Text("Sin conexión a internet",
                             style: TextStyle(color: Colors.red)),
                       )),
             Expanded(
@@ -422,9 +423,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       Expanded(
                         flex: 1,
                         child: StatusBar(
-                          colorBtl: _connected ? Color(0xff72D838) : Colors.red,
+                          colorBtl:
+                              _connected ? const Color(0xff72D838) : Colors.red,
                           colorNetwork: _connectedToNetwork
-                              ? Color(0xff72D838)
+                              ? const Color(0xff72D838)
                               : Colors.red,
                         ),
                       ),

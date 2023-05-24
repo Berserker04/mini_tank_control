@@ -1,10 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 const htmlData = r"""
   <iframe
     width="100%"
-    height="1000"
+    height="285"
     id="inlineFrameExample"
     title="Camera preview"
     src="https://minitank.chernandezdev.online/"
