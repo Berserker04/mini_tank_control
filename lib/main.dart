@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double _movingX = 2;
   double _movingSpeed = 250 / 2;
   bool _connectedToNetwork = false;
-  String _sensor1 = "---";
+  String _sensor1 = "0";
   String _sensor2 = "---";
   String _sensor3 = "---";
 
