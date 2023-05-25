@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 class Sensors extends StatefulWidget {
@@ -28,11 +30,15 @@ class _SensorsState extends State<Sensors> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('sensor: ${widget.sensor1}',
+          Text('Frente: ${widget.sensor1} cm de proximidad',
+              style: TextStyle(
+                  color: (int.parse(widget.sensor1) <= 30)
+                      ? Colors.red[200]
+                      : Colors.white,
+                  fontSize: (int.parse(widget.sensor1) <= 30) ? 13 : 12)),
+          Text('sensor 2: ${widget.sensor2}',
               style: const TextStyle(color: Colors.white, fontSize: 12)),
-          Text('sensor: ${widget.sensor2}',
-              style: const TextStyle(color: Colors.white, fontSize: 12)),
-          Text('sensor: ${widget.sensor3}',
+          Text('sensor 3: ${widget.sensor3}',
               style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),

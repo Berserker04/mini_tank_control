@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _movingSpeed = value;
     });
-    sendCommand("movingSpeed/$value");
+    sendCommand("motorSpeed/$value");
   }
 
   // _forward
@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _connecting = false;
   bool isDisconnecting = false;
   bool _stateLed = false;
+  bool _toggleKeyY = true;
   final bool _stateBlink = false;
 
   double power = 250;
@@ -188,11 +189,9 @@ class _MyHomePageState extends State<MyHomePage> {
       connection = await BluetoothConnection.toAddress(hc_05.address);
 
       connection.input?.listen((Uint8List data) {
-        // print('Data incoming: ${ascii.convert(data)}');
+        // print('Data 4 incoming: ${ascii.convert(data)}');
 
         String newData = ascii.convert(data);
-
-        print('Data incoming: $newData');
 
         List<String> toArray = newData.split("/");
 
@@ -200,7 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
           String key = toArray[0];
           String value = toArray[1];
 
-          if (key == "sensor1") {
+          if (key == "sensorFront") {
+            if (int.parse(value) <= 30) {
+              _movingYHandle(2);
+            }
             setState(() {
               _sensor1 = value;
             });
@@ -317,7 +319,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   borderRadius: BorderRadius.circular(50),
                   color: _connected ? Colors.green : Colors.red,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.power_settings_new,
                   size: 35,
                   color: Colors.white,
@@ -358,7 +360,26 @@ class _MyHomePageState extends State<MyHomePage> {
                           flex: 4,
                           child: Row(
                             children: [
-                              Expanded(flex: 3, child: Container()),
+                              Expanded(
+                                  flex: 4,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        _toggleKeyY
+                                            ? Icons.lock
+                                            : Icons.lock_open,
+                                        size: 35,
+                                        color: _toggleKeyY
+                                            ? Colors.green
+                                            : Colors.blueGrey,
+                                        weight: 5,
+                                      ),
+                                      onPressed: () => setState(() {
+                                        _toggleKeyY = !_toggleKeyY;
+                                      }),
+                                    ),
+                                  )),
                               Expanded(
                                   flex: 8,
                                   child: RotatedBox(
@@ -366,11 +387,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: SliderTheme(
                                       data: _getThemeSlider(),
                                       child: Slider(
-                                          max: 3,
-                                          min: 1,
-                                          value: _movingY,
-                                          divisions: 2,
-                                          onChanged: _movingYHandle),
+                                        max: 3,
+                                        min: 1,
+                                        value: _movingY,
+                                        divisions: 2,
+                                        onChanged: _movingYHandle,
+                                        onChangeEnd: (double n) {
+                                          if (!_toggleKeyY) {
+                                            _movingYHandle(2);
+                                          }
+                                        },
+                                      ),
                                     ),
                                   )),
                               Expanded(
@@ -445,6 +472,9 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: SliderTheme(
                             data: _getThemeSlider(),
                             child: Slider(
+                                onChangeEnd: (double n) {
+                                  _movingXHandle(2);
+                                },
                                 max: 3,
                                 min: 1,
                                 value: _movingX,
